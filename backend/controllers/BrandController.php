@@ -9,9 +9,12 @@ use xj\uploadify\UploadAction;
 
 class BrandController extends \yii\web\Controller
 {
+    /*
+     * 品牌列表
+     */
     public function actionIndex()
     {
-        $query = Brand::find();
+        $query = Brand::find()->where(['!=','status','-1']);
 
         $pager = new Pagination([
             'totalCount'=>$query->count(),
@@ -94,9 +97,9 @@ class BrandController extends \yii\web\Controller
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
                     $action->output['fileUrl'] = $action->getWebUrl();
-                    $action->getFilename(); // "image/yyyymmddtimerand.jpg"
-                    $action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
-                    $action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+//                    $action->getFilename(); // "image/yyyymmddtimerand.jpg"
+//                    $action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
+//                    $action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
                 },
             ],
         ];
