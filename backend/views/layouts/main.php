@@ -28,22 +28,43 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => '京西商城后台管理',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
     $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => '首页', 'url' => ['site/index']],
+        [
+            'label' => '品牌管理',
+            'items' => [
+                ['label' => '品牌列表', 'url' => ['brand/index']],
+                ['label' => '添加品牌', 'url' => ['brand/add']],
+            ],
+        ],
+        [
+            'label' => '文章分类管理',
+            'items' => [
+                ['label' => '文章分类列表', 'url' => ['article-category/index']],
+                ['label' => '添加文章分类', 'url' => ['article-category/add']],
+            ],
+        ],
+        [
+            'label' => '文章管理',
+            'items' => [
+                ['label' => '文章列表', 'url' => ['article/index']],
+                ['label' => '添加文章', 'url' => ['article/add']],
+            ],
+        ],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => '登录', 'url' => ['/site/login']];
     } else {
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['site/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                '注销 (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()
