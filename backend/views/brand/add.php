@@ -31,7 +31,7 @@ function(file, data, response) {
     if (data.error) {
         console.log(data.msg);
     } else {
-        //console.log(data.fileUrl);
+        console.log(data);
         $("#brand-logo").val(data.fileUrl);
         $("#img").attr("src",data.fileUrl);
     }

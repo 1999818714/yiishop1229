@@ -6,6 +6,7 @@ use backend\models\Brand;
 use yii\data\Pagination;
 use yii\web\UploadedFile;
 use xj\uploadify\UploadAction;
+use crazyfd\qiniu\Qiniu;
 
 class BrandController extends \yii\web\Controller
 {
@@ -96,12 +97,39 @@ class BrandController extends \yii\web\Controller
                 'afterValidate' => function (UploadAction $action) {},
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
-                    $action->output['fileUrl'] = $action->getWebUrl();
+                    //$action->output['fileUrl'] = $action->getWebUrl();
 //                    $action->getFilename(); // "image/yyyymmddtimerand.jpg"
 //                    $action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
 //                    $action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+                    //$action->output['Path'] = $action->getSavePath();
+                    /*
+                     * 将图片上传到七牛云
+                     */
+                    $qiniu = \Yii::$app->qiniu;//实例化七牛云组件
+                    $qiniu->uploadFile($action->getSavePath(),$action->getFilename());//将本地图片上传到七牛云
+                    $url = $qiniu->getLink($action->getFilename());//获取图片在七牛云上的url地址
+                    $action->output['fileUrl'] = $url;//将七牛云图片地址返回给前端js
                 },
             ],
         ];
+    }
+
+
+    public function actionTest()
+    {
+//        $fileName = \Yii::getAlias('@webroot');
+//        var_dump($fileName);exit;
+        /*$ak = 'hqNnJqiC0r7xoCcroZKMbqgbmELaZPyYmrbnNIDg';
+        $sk = 'KwzsOiQ7UbAesjwXKh5fMblJCbbrOHuN6grCQxzq';
+        $domain = 'http://onk0ygatz.bkt.clouddn.com/';
+        $bucket = 'yiishop-php1229';*/
+
+        //$qiniu = new Qiniu($ak, $sk,$domain, $bucket);
+        /*$qiniu = \Yii::$app->qiniu;
+        $key = '58d9db9421bc7.png';//指定上传到七牛云的文件名
+        $fileName = \Yii::getAlias('@webroot').'/upload/brand/58d9db9421bc7.png';
+        $qiniu->uploadFile($fileName,$key);
+        $url = $qiniu->getLink($key);
+        return $url;*/
     }
 }

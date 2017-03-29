@@ -56,4 +56,20 @@ class Brand extends \yii\db\ActiveRecord
             'status' => '状态',
         ];
     }
+
+    /*
+     * 处理图片地址
+     * 如果是本地图片,添加@web别名
+     * 如果是远程图片,不做处理
+     */
+    public function logoUrl()
+    {
+        //   http://www    0
+        //   123http://www    3
+        // 123   false
+        if(strpos($this->logo,'http://')===false){
+            return '@web'.$this->logo;
+        }
+        return $this->logo;
+    }
 }

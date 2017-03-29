@@ -14,7 +14,7 @@
     <tr>
         <td><?=$model->id?></td>
         <td><?=$model->name?></td>
-        <td><?=\yii\bootstrap\Html::img('@web'.$model->logo,['style'=>'max-height:30px'])?></td>
+        <td><?=\yii\bootstrap\Html::img($model->logoUrl(),['style'=>'max-height:30px'])?></td>
         <td><?=\backend\models\Brand::$status_options[$model->status]?></td>
         <td>编辑 删除</td>
     </tr>
