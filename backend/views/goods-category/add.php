@@ -31,6 +31,7 @@ var zTreeObj;
         callback: {
 		    onClick: function(event, treeId, treeNode){
                 console.log(treeNode.id);
+                //分类被点击时,将分类的id赋值给parent_id隐藏域
                 $("#goodscategory-parent_id").val(treeNode.id);
 		    }
 	    }
@@ -39,7 +40,8 @@ var zTreeObj;
     var zNodes =  {$models};
 
     zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-    zTreeObj.expandAll(true);
+    zTreeObj.expandAll(true);//展开所有节点
+    zTreeObj.selectNode(zTreeObj.getNodeByParam("id", "{$model->parent_id}", null));//选中节点
 EOT;
 
 $this->registerJs($js);

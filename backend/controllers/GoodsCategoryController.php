@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\GoodsCategory;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -41,6 +42,37 @@ class GoodsCategoryController extends \yii\web\Controller
         return $this->render('add',['model'=>$model,'models'=>$models]);
     }
 
+    /**
+     * 商品分类修改
+     */
+    public function actionEdit($id)
+    {
+        $model = GoodsCategory::findOne(['id'=>$id]);
+        if($model->load(\Yii::$app->request->post()) && $model->validate()){
+            try{
+                if($model->parent_id == 0){
+                    $model->makeRoot();//创建一级分类
+
+                }else{
+                    //创建非一级分类
+                    //1 查找父分类
+                    $parent_cate = GoodsCategory::findOne(['id'=>$model->parent_id]);
+                    $model->prependTo($parent_cate);
+                    \Yii::$app->session->setFlash('success','分类修改成功');
+                    return $this->refresh();//刷新本页(跳转到当前页)
+                }
+            }catch(Exception $e){
+                \Yii::$app->session->setFlash('danger',$e->getMessage());
+                $model->addError('parent_id',$e->getMessage());
+            }
+            //exit;
+
+        }
+        $models = GoodsCategory::find()->asArray()->all();
+        $models[] = ['id'=>0,'parent_id'=>0,'name'=>'顶级分类'];
+        $models = Json::encode($models);
+        return $this->render('add',['model'=>$model,'models'=>$models]);
+    }
     public function actionTest2()
     {
         $cate = new GoodsCategory(['name' => '手机/运营商/数码']);
@@ -69,4 +101,13 @@ class GoodsCategoryController extends \yii\web\Controller
         return $this->renderPartial('test',['models'=>$models]);
     }
 
+    /*
+     * 商品分类列表
+     */
+    public function actionList()
+    {
+        $models = GoodsCategory::find()->orderBy('tree,lft')->all();
+
+        return $this->render('list',['models'=>$models]);
+    }
 }
