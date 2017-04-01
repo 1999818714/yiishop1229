@@ -80,4 +80,9 @@ class GoodsCategory extends \yii\db\ActiveRecord
     {
         return new GoodsCategoryQuery(get_called_class());
     }
+
+    public static function getZNodes()
+    {
+        return array_merge([['id'=>0,'parent_id'=>0,'name'=>'顶级分类']],self::find()->asArray()->all());
+    }
 }

@@ -28,6 +28,7 @@
 $js = <<<EOT
     $(".expand").click(function(){
         //切换图标样式
+        var show = $(this).hasClass("glyphicon-chevron-up");
         $(this).toggleClass("glyphicon-chevron-down");
         $(this).toggleClass("glyphicon-chevron-up");
         //找出当前分类同一棵树下的子孙分类   同一颗树左值大于当前分类左值并且右值小于当前分类右值
@@ -40,9 +41,9 @@ $js = <<<EOT
             var lft = $(this).attr("data-lft");//分类的左值
             var rgt = $(this).attr("data-rgt");//分类的右值
             var tree = $(this).attr("data-tree");//分类的tree值
-            if(tree == current_tree && lft > current_lft && rgt < current_rgt){
+            if(parseInt(tree) == parseInt(current_tree) && parseInt(lft) > parseInt(current_lft) && parseInt(rgt) < parseInt(current_rgt)){
                 //当前分类的子孙分类隐藏或显示
-                $(this).fadeToggle();
+                show?$(this).fadeIn():$(this).fadeOut();
             }
         });
 
