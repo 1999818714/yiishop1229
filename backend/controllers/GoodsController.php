@@ -6,6 +6,7 @@ use backend\models\Goods;
 use backend\models\GoodsDayCount;
 use backend\models\GoodsGallery;
 use backend\models\GoodsIntro;
+use backend\models\GoodsSearchForm;
 use xj\uploadify\UploadAction;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
@@ -15,14 +16,21 @@ class GoodsController extends \yii\web\Controller
 {
     public function actionIndex()
     {
+        $model = new GoodsSearchForm();
         $query = Goods::find();
+        //接收表单提交的查询参数
+        $model->search($query);
+
+
+        //商品名称含有"耳机"的  name like "%耳机%"
+        //$query = Goods::find()->where(['like','name','耳机']);
         $pager = new Pagination([
             'totalCount'=>$query->count(),
             'pageSize'=>5
         ]);
 
         $models = $query->limit($pager->limit)->offset($pager->offset)->all();
-        return $this->render('index',['models'=>$models,'pager'=>$pager]);
+        return $this->render('index',['models'=>$models,'pager'=>$pager,'model'=>$model]);
     }
     /*
      * 添加商品
@@ -52,8 +60,11 @@ class GoodsController extends \yii\web\Controller
                     $goodsCount->count = 0;
                     $goodsCount->save();
                 }
+                //$goodsCount;
+                //字符串长度补全
+                //substr('000'.($goodsCount->count+1),-4,4);
+                $model->sn = date('Ymd').sprintf("%04d",$goodsCount->count+1);
 
-                $model->sn = date('Ymd').preg_replace('/(\d{4})$/','$1','000'.($goodsCount->count+1));
                 $model->save();
                 $introModel->goods_id = $model->id;
                 $introModel->save();
@@ -112,7 +123,7 @@ class GoodsController extends \yii\web\Controller
                     "imageUrlPrefix"  => "",//图片访问路径前缀
                     "imagePathFormat" => "/upload/{yyyy}{mm}{dd}/{time}{rand:6}" ,//上传保存路径
                     "imageRoot" => \Yii::getAlias("@webroot"),
-            ],
+                ],
             ],
 
             's-upload' => [
@@ -175,4 +186,29 @@ class GoodsController extends \yii\web\Controller
         ];
     }
 
+    public function actionTest()
+    {
+        //echo substr('000'.'99',-4,4);
+        //echo sprintf("%04d",4448);
+        //echo str_pad('1',4,0,STR_PAD_LEFT);
+        //return $this->render('test');
+
+
+        //加盐加密
+        $salt = '@woai?php*.com';
+        $salt2 = time();
+        $str = '123456';
+        $password = md5($salt.$str.$salt2);
+        /*$salt = '@woai?php*.com'.rand(100,999);
+        $password2 = md5($str.$salt);*/
+        //echo $password;
+        /*echo '<br>';
+        echo $password2;*/
+
+
+        $str2= '123456';
+        $salt = '@woai?php*.com'.rand(100,999);
+        $password2 = md5($str.$salt);
+        var_dump($password == $password2);
+    }
 }

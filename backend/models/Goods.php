@@ -28,6 +28,20 @@ class Goods extends \yii\db\ActiveRecord
 
     public static $sale_options = [1=>'上架',0=>'下架'];
     public static $status_options = [1=>'正常',0=>'删除'];
+
+    //const SCENARIO_SEARCH = 'search';
+    /*
+     * 定义场景
+     */
+   /* public function scenarios()
+    {
+        $scenarios = parent::scenarios();//获取覆类定义的场景
+        //和当前模型场景合并
+        return ArrayHelper::merge([
+            self::SCENARIO_SEARCH => [],
+        ],$scenarios);
+    }*/
+
     /**
      * @inheritdoc
      */

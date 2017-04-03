@@ -2,7 +2,20 @@
 /* @var $this yii\web\View */
 ?>
 <h1>goods/index</h1>
-
+<?php
+$form = \yii\bootstrap\ActiveForm::begin([
+    'method' => 'get',
+    //get方式提交,需要显式指定action
+    'action'=>\yii\helpers\Url::to(['goods/index']),
+    'options'=>['class'=>'form-inline']
+]);
+echo $form->field($model,'name')->textInput(['placeholder'=>'商品名'])->label(false);
+echo $form->field($model,'sn')->textInput(['placeholder'=>'货号'])->label(false);
+echo $form->field($model,'minPrice')->textInput(['placeholder'=>'￥'])->label(false);
+echo $form->field($model,'maxPrice')->textInput(['placeholder'=>'￥'])->label('-');
+echo \yii\bootstrap\Html::submitButton('搜索');
+\yii\bootstrap\ActiveForm::end();
+?>
 <table class="table">
     <tr>
         <th>ID</th>
