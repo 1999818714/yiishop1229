@@ -50,7 +50,9 @@ return [
             'domain' => 'http://onk0ygatz.bkt.clouddn.com/',
             'bucket' => 'yiishop-php1229',
             'region'=>\backend\components\Qiniu::HOST_HUADONG
-        ]
+        ],
+
+
 
     ],
     'params' => $params,
