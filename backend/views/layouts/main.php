@@ -34,9 +34,25 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+    /*
+     * $menuItems = [
+         [
+            'label' => '首页',
+            'url' => ['site/index']
+         ],
+         [
+                'label' => '品牌管理',
+                'items' => [
+                    ['label' => '品牌列表', 'url' => ['brand/index']],
+                    ['label' => '添加品牌', 'url' => ['brand/add']],
+                ],
+            ],
+         ];
+     */
     $menuItems = [
         ['label' => '首页', 'url' => ['site/index']],
-        [
+
+        /*[
             'label' => '商品管理',
             'items' => [
                 ['label' => '商品列表', 'url' => ['goods/index']],
@@ -63,11 +79,14 @@ AppAsset::register($this);
                 ['label' => '文章列表', 'url' => ['article/index']],
                 ['label' => '添加文章', 'url' => ['article/add']],
             ],
-        ],
+        ],*/
     ];
+
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => '登录', 'url' => ['/site/login']];
     } else {
+        //获取当前登录用户对应的菜单
+        $menuItems = \yii\helpers\ArrayHelper::merge($menuItems, Yii::$app->user->identity->getMenuItems());
         $menuItems[] = '<li>'
             . Html::beginForm(['site/logout'], 'post')
             . Html::submitButton(

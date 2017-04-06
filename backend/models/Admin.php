@@ -151,4 +151,42 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->auth_key == $authKey;
     }
+
+    public function getMenuItems()
+    {
+        $menuItems = [];
+        //根据当前用户的权限获取菜单
+        //遍历所有菜单，判断当前用户是否有对应权限
+        //>1 获取所有1级菜单
+
+        $menus = Menu::find()->where(['parent_id'=>0])->all();
+        foreach($menus as $menu){
+            //根据菜单之间的关系（一级菜单--》二级菜单  1对多）
+            $items = [];
+            foreach($menu->menus as $child){
+                //判断用户是否有该权限
+                if(Yii::$app->user->can($child->url)){
+                    $items[] = ['label' => $child->name, 'url' => $child->url];
+                }
+            }
+            $menuItems[] = [
+                'label' => $menu->name,
+                'items' => $items,
+                /*[
+                    ['label' => '商品列表', 'url' => ['goods/index']],
+                    ['label' => '添加商品', 'url' => ['goods/add']],
+                ]*/
+            ];
+        }
+        return $menuItems;
+
+        /*return [
+            'label' => '商品管理',
+            'items' => [
+                ['label' => '商品列表', 'url' => ['goods/index']],
+                ['label' => '添加商品', 'url' => ['goods/add']],
+            ],
+        ];*/
+
+    }
 }
