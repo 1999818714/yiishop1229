@@ -45,4 +45,17 @@ class PermissionForm extends Model
             $this->addError($attribute,'权限已存在');
         }
     }
+
+    /*
+     * add() 保存权限
+     */
+    public function add()
+    {
+        $authManager = \Yii::$app->authManager;
+        //1 添加user/add权限
+        $permission = $authManager->createPermission($this->name);//创建权限
+        $permission->description = $this->description;
+        //添加到数据表
+        return $authManager->add($permission);
+    }
 }
