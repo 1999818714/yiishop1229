@@ -163,20 +163,24 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         foreach($menus as $menu){
             //根据菜单之间的关系（一级菜单--》二级菜单  1对多）
             $items = [];
-            foreach($menu->menus as $child){
+            foreach($menu->children as $child){
                 //判断用户是否有该权限
                 if(Yii::$app->user->can($child->url)){
-                    $items[] = ['label' => $child->name, 'url' => $child->url];
+                    $items[] = ['label' => $child->name, 'url' => [$child->url]];
                 }
             }
-            $menuItems[] = [
-                'label' => $menu->name,
-                'items' => $items,
-                /*[
-                    ['label' => '商品列表', 'url' => ['goods/index']],
-                    ['label' => '添加商品', 'url' => ['goods/add']],
-                ]*/
-            ];
+            //至少有一个二级菜单权限才显示该菜单组
+            if(!empty($items)){
+                $menuItems[] = [
+                    'label' => $menu->name,
+                    'items' => $items,
+                    /*[
+                        ['label' => '商品列表', 'url' => ['goods/index']],
+                        ['label' => '添加商品', 'url' => ['goods/add']],
+                    ]*/
+                ];
+            }
+
         }
         return $menuItems;
 

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filters\AccessFilter;
 use backend\models\Brand;
 use yii\data\Pagination;
 use yii\web\UploadedFile;
@@ -10,6 +11,20 @@ use crazyfd\qiniu\Qiniu;
 
 class BrandController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'accessFilter'=>[
+                'class'=>AccessFilter::className(),
+                //'only'=>['index','add','edit','s-upload'],//指定需要进行权限控制的操作
+            ],
+        ];
+    }
+    public function actionLogin()
+    {
+        return 'login';
+    }
+
     /*
      * 品牌列表
      */
