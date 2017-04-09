@@ -16,9 +16,10 @@ return [
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => \frontend\models\Member::className(),
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'loginUrl'=>['member/login'],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend

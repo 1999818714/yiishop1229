@@ -1,4 +1,6 @@
+<?php
 
+?>
 <!-- 登录主体部分start -->
 <div class="login w990 bc mt10 regist">
     <div class="login_hd">
@@ -8,27 +10,38 @@
     <div class="login_bd">
         <div class="login_form fl">
             <?php
-            $form = \yii\widgets\ActiveForm::begin();
-            echo '<ul>';
-            $button =  '<input type="button" onclick="bindPhoneNum(this)" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px">';
-
-            echo $form->field($model,'username',
+            $form = \yii\widgets\ActiveForm::begin(
                 [
-                    'options'=>['tag'=>'li'],//包裹整个输入框的标签
-                    'errorOptions'=>['tag'=>'p'],//错误信息的标签
-                    'template'=>"{label}\n{input}$button\n{hint}\n{error}",//输出模板
+                    //定义该表单所有field参数
+                    'fieldConfig'=>[
+                        'options'=>['tag'=>'li'],//包裹整个输入框的标签
+                        'errorOptions'=>['tag'=>'p'],//错误信息的标签
+                    ],
                 ]
-            )->textInput(['class'=>'txt','placeholder'=>'3-20位字符，']);
-            //echo $form->field($model,'password')->passwordInput(['class'=>'txt']);
+            );
+            echo '<ul>';
 
+            echo $form->field($model,'username')->textInput(['class'=>'txt','placeholder'=>'请输入用户名']);
+            echo $form->field($model,'password')->passwordInput(['class'=>'txt']);
+            echo $form->field($model,'repassword')->passwordInput(['class'=>'txt']);
+            echo $form->field($model,'email')->textInput(['class'=>'txt']);
+            echo $form->field($model,'tel')->textInput(['class'=>'txt']);
+
+            $button =  '<input type="button" id="get_captcha" value="获取验证码" style="height: 25px;padding:3px 8px;margin-left: 10px">';
+            echo $form->field($model,'smscode',[
+                'template'=>"{label}\n{input}$button\n{hint}\n{error}",//输出模板
+            ])->textInput(['class'=>'txt','style'=>'width:100px']);
+            echo $form->field($model,'code',[
+                'options'=>['class'=>'checkcode']
+            ])->widget(
+                \yii\captcha\Captcha::className(),[
+                    'template'=>'{input}{image} ',
+                ]
+            );
             echo '<li><label for="">&nbsp;</label>'.\yii\helpers\Html::submitButton('',['class'=>'login_btn']).'</li>';
             echo '</ul>';
             \yii\widgets\ActiveForm::end();
-
             ?>
-            
-
-
         </div>
 
         <div class="mobile fl">
@@ -40,11 +53,16 @@
     </div>
 </div>
 <!-- 登录主体部分end -->
-<script type="text/javascript">
-    function bindPhoneNum(){
-        //启用输入框
-        $('#captcha').prop('disabled',false);
+<?php
+/**
+ *  @var $this \yii\web\View
+ */
 
+$this->registerJs(new \yii\web\JsExpression(
+    <<<EOT
+$("#get_captcha").click(function(){
+        //启用输入框
+        //$('#captcha').prop('disabled',false);
         var time=30;
         var interval = setInterval(function(){
             time--;
@@ -56,10 +74,12 @@
                 var html = time + ' 秒后再次获取';
                 $('#get_captcha').prop('disabled',true);
             }
-
             $('#get_captcha').val(html);
         },1000);
-    }
-</script>
+});
+EOT
+    ));
+
+
 
 
