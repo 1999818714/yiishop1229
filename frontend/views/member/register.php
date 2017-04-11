@@ -57,10 +57,17 @@
 /**
  *  @var $this \yii\web\View
  */
-
+$url = \yii\helpers\Url::to(['member/sms']);
+$token = Yii::$app->request->csrfToken;
 $this->registerJs(new \yii\web\JsExpression(
     <<<EOT
 $("#get_captcha").click(function(){
+        //发起AJAX（post）请求到 member/sms
+        var tel = $("#member-tel").val();//获取电话号码
+        $.post("{$url}",{"tel":tel,"_csrf-frontend":"{$token}"},function(data){
+            console.log(data);
+        });
+
         //启用输入框
         //$('#captcha').prop('disabled',false);
         var time=30;

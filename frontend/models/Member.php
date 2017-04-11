@@ -56,7 +56,18 @@ class Member extends \yii\db\ActiveRecord implements IdentityInterface
             //两次密码一致
             ['repassword','compare','compareAttribute'=>'password','message'=>'两次密码不一致'],
             //验证短信验证码
+            ['smscode','validateSmscode']
         ];
+    }
+
+    public function validateSmscode()
+    {
+        //根据电话号码从session获取短信验证码
+        $code = Yii::$app->session->get('tel_'.$this->tel);
+        //和表单提交的短信验证码对比
+        if($code != $this->smscode){
+            $this->addError('smscode','验证码不正确');
+        }
     }
 
     /**
