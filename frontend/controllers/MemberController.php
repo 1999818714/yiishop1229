@@ -10,6 +10,7 @@ use Flc\Alidayu\Client;
 use Flc\Alidayu\App;
 use Flc\Alidayu\Requests\AlibabaAliqinFcSmsNumSend;
 use Flc\Alidayu\Requests\IRequest;
+use yii\helpers\Json;
 
 class MemberController extends \yii\web\Controller
 {
@@ -80,10 +81,10 @@ class MemberController extends \yii\web\Controller
         \Yii::$app->session->set('tel_'.$tel,$code);
         //发送短信验证码到手机
 
-        return [
+        return Json::encode([
             'err_code'=>0,
             'msg'=>'短信发送成功'
-        ];
+        ]);
 
     }
 
