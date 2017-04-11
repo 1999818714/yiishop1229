@@ -11,6 +11,8 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'layout'=>'index',//默认布局文件
+    'defaultRoute'=>'index/index',//默认路由
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',

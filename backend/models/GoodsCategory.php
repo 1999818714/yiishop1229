@@ -85,4 +85,9 @@ class GoodsCategory extends \yii\db\ActiveRecord
     {
         return array_merge([['id'=>0,'parent_id'=>0,'name'=>'顶级分类']],self::find()->asArray()->all());
     }
+
+    public function getChildren()
+    {
+        return $this->hasMany(self::className(),['parent_id'=>'id']);
+    }
 }
