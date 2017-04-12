@@ -58,9 +58,19 @@ class ArticleController extends \yii\web\Controller
             $article_detail->save();
 
             \Yii::$app->session->setFlash('success','文章修改成功');
-            return $this->redirect(['index']);
+            return $this->refresh(['index']);
         }
 
         return $this->render('add',['article'=>$article,'article_detail'=>$article_detail]);
+    }
+
+    /*
+     * 查看文章
+     */
+    public function actionView($id)
+    {
+        $model = Article::findOne($id);
+
+        return $this->render('view',['model'=>$model]);
     }
 }

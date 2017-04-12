@@ -10,6 +10,7 @@ namespace frontend\controllers;
 
 
 use yii\web\Controller;
+use yii\web\Cookie;
 
 class IndexController extends Controller
 {
@@ -41,7 +42,7 @@ class IndexController extends Controller
     /*
      * 发送邮件
      */
-    public function actionMail()
+    /*public function actionMail()
     {
         $r = \Yii::$app->mailer->compose()
             ->setFrom('quan0125bin@163.com')
@@ -51,5 +52,74 @@ class IndexController extends Controller
             ->setHtmlBody('<b>阿里云服务器不得不知道的禁忌2</b>')
             ->send();
         var_dump($r);
+    }*/
+
+
+
+    /*
+     * 添加到购车车提示页
+     */
+    public function actionNotice($goods_id,$num=1)
+    {
+        if(\Yii::$app->user->isGuest){
+            //将购物车的数据取出
+            $cookies = \Yii::$app->request->cookies;
+            $cookie = $cookies->get('cart');
+            if($cookie == null){//购物车cookie不存在
+                $cart = [];
+            }else{//购物车cookie存在
+                $cart = unserialize($cookie->value);
+            }
+            //将商品id和数量保存到cookie  //array_key_exists()检查数组中是否有给定键名
+            //if(isset($cart[$goods_id]))
+            if(array_key_exists($goods_id,$cart)){
+                //2 购物车已经有该商品  数量累加
+                $cart[$goods_id] += $num;
+            }else{
+                //1 购物车没有该商品   直接添加到数组
+                $cart[$goods_id] = $num;
+            }
+
+            //将购车数据保存回cookie
+            $cookies = \Yii::$app->response->cookies;
+            $cookie = new Cookie([
+                'name'=>'cart',
+                'value'=>serialize($cart)
+            ]);
+
+            $cookies->add($cookie);
+        }else{
+            //1 检查购物车有没有该商品(根据goods_id member_id查询)
+            //1.1 有该商品  数量累加
+            //1.2 没有该商品  添加到数据表
+
+        }
+
+
+        //直接跳转到购物车
+        return $this->redirect(['index/cart']);
+    }
+
+
+    /*
+     * 购物车
+     */
+    public function actionCart()
+    {
+        if(\Yii::$app->user->isGuest){
+            //将商品id和数量从cookie取出
+            $cookies = \Yii::$app->request->cookies;
+            $cookie = $cookies->get('cart');
+            if($cookie == null){//购物车cookie不存在
+                $cart = [];
+            }else{//购物车cookie存在
+                $cart = unserialize($cookie->value);
+            }
+        }else{
+            //用户已登录，从数据表获取购物车数据
+            $cart = Cart::find()->where(['member_id'=>\Yii::$app->user->id])->asArray()->all();
+        }
+
+        var_dump($cart);
     }
 }
