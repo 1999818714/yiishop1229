@@ -9,12 +9,14 @@
 namespace frontend\controllers;
 
 
+use backend\models\Goods;
+use frontend\components\CookieHandler;
 use yii\web\Controller;
 use yii\web\Cookie;
 
 class IndexController extends Controller
 {
-
+    public $enableCsrfValidation = false;
     /*
      * 首页
      */
@@ -106,6 +108,7 @@ class IndexController extends Controller
      */
     public function actionCart()
     {
+        $this->layout = 'cart';
         if(\Yii::$app->user->isGuest){
             //将商品id和数量从cookie取出
             $cookies = \Yii::$app->request->cookies;
@@ -119,7 +122,86 @@ class IndexController extends Controller
             //用户已登录，从数据表获取购物车数据
             $cart = Cart::find()->where(['member_id'=>\Yii::$app->user->id])->asArray()->all();
         }
+        //$cart;//[1=>2,2=>9]
+        //var_dump($cart);
+        $models = [];//[[id=>1,logo=>'',name=>'',price=>'','num'=>2],[]]
+        //循环获取商品数据，构造购物车需要的格式
+        foreach($cart as $id=>$num){
+            $goods = Goods::find()->where(['id'=>$id])->asArray()->one();
+            $goods['num']=$num;
+            $models[]=$goods;
+        }
+//        var_dump($models);exit;
 
-        var_dump($cart);
+        return $this->render('cart',['models'=>$models]);
+    }
+
+    /*
+     * 修改购物车商品数量
+     * $filter = modify   del
+     */
+    public function actionAjax($filter)
+    {
+        switch ($filter){
+            case 'modify':
+                //修改商品数量 goods_id  num
+                $goods_id = \Yii::$app->request->post('goods_id');
+                $num = \Yii::$app->request->post('num');
+
+                if(\Yii::$app->user->isGuest){
+                    /*$cookies = \Yii::$app->request->cookies;
+                    $cookie = $cookies->get('cart');
+                    if($cookie == null){//购物车cookie不存在
+                        $cart = [];
+                    }else{//购物车cookie存在
+                        $cart = unserialize($cookie->value);
+                    }
+
+                    $cart[$goods_id] = $num;
+                    //将购车数据保存回cookie
+                    $cookies = \Yii::$app->response->cookies;
+                    $cookie = new Cookie([
+                        'name'=>'cart',
+                        'value'=>serialize($cart)
+                    ]);
+
+                    $cookies->add($cookie);*/
+                    \Yii::$app->cartCookie->updateCart($goods_id,$num)->save();
+                }
+                return 'success';
+                break;
+
+            case 'del':
+                //删除商品
+                $goods_id = \Yii::$app->request->post('goods_id');
+
+                if(\Yii::$app->user->isGuest){
+                    /*$cookies = \Yii::$app->request->cookies;
+                    $cookie = $cookies->get('cart');
+                    if($cookie == null){//购物车cookie不存在
+                        $cart = [];
+                    }else{//购物车cookie存在
+                        $cart = unserialize($cookie->value);
+                    }
+                    //清除购物车中该id对应的商品
+                    unset($cart[$goods_id]);
+                    //将购车数据保存回cookie
+                    $cookies = \Yii::$app->response->cookies;
+                    $cookie = new Cookie([
+                        'name'=>'cart',
+                        'value'=>serialize($cart)
+                    ]);
+
+                    $cookies->add($cookie);*/
+                   /* $cart = new CookieHandler();
+                    $cart->delCart($goods_id);
+                    $cart->save();*/
+                    \Yii::$app->cartCookie->delCart($goods_id)->save();
+                    return 'success';
+                }
+                break;
+        }
+
+
     }
 }
