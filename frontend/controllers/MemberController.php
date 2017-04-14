@@ -61,6 +61,8 @@ class MemberController extends \yii\web\Controller
     public function actionLogin(){
         $member = Member::findOne(['id'=>1]);
         \Yii::$app->user->login($member);
+        //登录成功后将cookie中的购物车数据同步到数据表,并清空cookie
+        \Yii::$app->cartCookie->synDb()->flushCart()->save();
         return $this->redirect(['member/address']);
     }
 

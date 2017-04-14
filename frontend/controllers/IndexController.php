@@ -10,13 +10,38 @@ namespace frontend\controllers;
 
 
 use backend\models\Goods;
+
 use frontend\components\CookieHandler;
+use frontend\models\Address;
+use frontend\models\Cart;
+use frontend\models\Order;
+use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\HttpException;
 
 class IndexController extends Controller
 {
     public $enableCsrfValidation = false;
+    public function behaviors()
+    {
+        return [
+            'access'=>[
+                'class'=>AccessControl::className(),
+                'only'=>['order'],
+                'rules'=>[
+                  [
+                      'allow'=>true,
+                      'actions'=>['order'],
+                      'roles'=>['@'],
+                  ]
+                ],
+            ],
+        ];
+    }
+
+
     /*
      * 首页
      */
@@ -120,7 +145,7 @@ class IndexController extends Controller
             }
         }else{
             //用户已登录，从数据表获取购物车数据
-            $cart = Cart::find()->where(['member_id'=>\Yii::$app->user->id])->asArray()->all();
+            $cart = ArrayHelper::map(Cart::find()->where(['member_id'=>\Yii::$app->user->id])->asArray()->all(),'id','amount');
         }
         //$cart;//[1=>2,2=>9]
         //var_dump($cart);
@@ -131,10 +156,57 @@ class IndexController extends Controller
             $goods['num']=$num;
             $models[]=$goods;
         }
-//        var_dump($models);exit;
+        //var_dump($models);exit;
 
         return $this->render('cart',['models'=>$models]);
     }
+
+    /*
+     * 订单确认页
+     */
+    public function actionOrder()
+    {
+        $this->layout = 'cart';
+
+        $order = new Order();
+        if($order->load(\Yii::$app->request->post())){
+            $order->member_id = \Yii::$app->user->id;
+            $address = Address::findOne(['id'=>\Yii::$app->request->post('address_id'),'member_id'=>$order->member_id]);
+            if($address==null){
+                throw new HttpException('404','地址不存在');
+            }
+            $order->name = $address->name;
+            $order->province = $address->province;
+            $order->city = $address->city;
+            $order->area = $address->area;
+            $order->detail_address = $address->detail;
+            $order->tel = $address->tel;
+            if($order->validate()){
+                $order->delivery_name = Order::$deliveries[$order->delivery_id][0];
+                $order->payment_name = Order::$payments[$order->payment_id][0];
+
+                //!TODO 检查库存，计算总价
+
+                $order->price = 0;
+                $order->status = 1;
+                $order->create_time = time();
+
+                $order->save();
+            }
+
+        }
+
+
+        $cart = Cart::find()->where(['member_id'=>\Yii::$app->user->id])->all();
+        $models=[];
+        foreach($cart as $item){
+            $goods = Goods::find()->where(['id'=>$item->id])->asArray()->one();
+            $goods['num']=$item->amount;
+            $models[]=$goods;
+        }
+        return $this->render('order',['models'=>$models]);
+    }
+
 
     /*
      * 修改购物车商品数量

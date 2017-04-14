@@ -4,6 +4,8 @@ namespace frontend\components;
 /*
 *操作cookie里面的购物车数据
 */
+use frontend\models\Cart;
+use yii\base\ErrorException;
 use yii\web\Cookie;
 
 class CookieHandler extends \yii\base\Component
@@ -22,7 +24,11 @@ class CookieHandler extends \yii\base\Component
         $this->_cart = $cart;
         parent::__construct($config);
     }
-
+    //获取cookie购物车数据
+    public function getCart()
+    {
+        return $this->_cart;
+    }
 
 
     //修改cookie购物车数据
@@ -56,6 +62,31 @@ class CookieHandler extends \yii\base\Component
         ]);
 
         $cookies->add($cookie);
+    }
+    //清空cookie购物车
+    public function flushCart()
+    {
+        $this->_cart = [];
+        return $this;
+    }
+    //同步到购物车数据库
+    public function synDb()
+    {
+        if(\Yii::$app->user->isGuest){
+            throw new ErrorException('必须登录后才能保存到数据库');
+        }
+        $member_id = \Yii::$app->user->id;
+        foreach($this->_cart as $goods_id=>$num){
+            $cart = Cart::findOne(['goods_id'=>$goods_id,'member_id'=>$member_id]);
+            if($cart == null){
+                $cart = new Cart();
+                $cart->member_id = $member_id;
+                $cart->goods_id = $goods_id;
+            }
+            $cart->amount = $num;
+            $cart->save();
+        }
+        return $this;
     }
 
 }
