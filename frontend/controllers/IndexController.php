@@ -15,6 +15,8 @@ use frontend\components\CookieHandler;
 use frontend\models\Address;
 use frontend\models\Cart;
 use frontend\models\Order;
+use frontend\models\OrderDetail;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -183,15 +185,49 @@ class IndexController extends Controller
             $order->tel = $address->tel;
             if($order->validate()){
                 $order->delivery_name = Order::$deliveries[$order->delivery_id][0];
+                $order->delivery_price = Order::$deliveries[$order->delivery_id][1];
                 $order->payment_name = Order::$payments[$order->payment_id][0];
 
-                //!TODO 检查库存，计算总价
 
-                $order->price = 0;
+
+                $order->price = 0;//计算总价
+                //如果支付方式是货到付款，则状态是 待发货；如果是在线支付，则状态是 待付款
                 $order->status = 1;
                 $order->create_time = time();
 
-                $order->save();
+                $db = Yii::$app->db;
+                $transaction = $db->beginTransaction();//开启事务
+                try {
+                    //$order->save();
+
+                    //订单详情表数据
+                    //从购物车数据表获取商品数据 $carts = [['goods_id'=>1,'amount'=>2],[]]
+                    //遍历购物车数据
+                    //foreach($carts as $cart){
+                    //$order_detail = new OrderDetail();
+                    //order_info_id  $order->save()--->$order->id;
+                    //goods_name logo price 根据goods_id获取商品信息，从商品信息中获取
+                    //$goods = Goods::findOne(['id'=>$goods_id]);
+                    //!TODO 检查库存  amount <= $goods->stock
+                    //if(amount > $goods->stock){
+                    //库存不足
+
+                    //抛出异常
+                    //throw new Exception('商品xxx的库存不足');
+
+                    //}
+                    //total_price = price * amount
+                    //$order_detail->save();
+                    //}
+                    $transaction->commit();//提交事务
+                }catch(Exception $e){
+                    $transaction->rollBack();//回滚
+                    //设置提示信息，
+                    //\Yii::$app->session->setFlash('danger','商品xxx的库存小于xxx，请修改数量后重新下单');
+                }
+                //事务 解决库存不足，需要回滚
+                //前提：数据表存储引擎必须是 innodb
+
             }
 
         }
