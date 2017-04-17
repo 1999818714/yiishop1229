@@ -24,7 +24,8 @@
         "kucha/ueditor": "*",
         "flc/alidayu": "^2.0",
         "overtrue/wechat": "^3.3",
-        "endroid/qrcode": "^1.9"
+        "endroid/qrcode": "^1.9",
+        "yiisoft/yii2-redis": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

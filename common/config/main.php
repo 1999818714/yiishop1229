@@ -9,6 +9,12 @@ return [
         //配置RBAC
         'authManager'=>[
             'class'=>\yii\rbac\DbManager::className(),
-        ]
+        ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
     ],
 ];

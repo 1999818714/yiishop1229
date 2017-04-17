@@ -532,4 +532,15 @@ class IndexController extends Controller
         return $response;
     }
 
+
+    public function actionRedis()
+    {
+        /*$redis = \Yii::$app->redis;
+//        $redis->set('name','张三');
+        $name = $redis->get('name');
+        var_dump($name);*/
+        \Yii::$app->session->set('age','20');
+        //var_dump(\Yii::$app->session->get('name'));
+
+    }
 }
