@@ -24,6 +24,18 @@ class WechatController extends Controller
         $server->setMessageHandler(function ($message) {
             switch ($message->MsgType) {
                 case 'event':
+                    switch ($message->Event) {
+                        case 'subscribe':
+                            # code...
+                            break;
+                        case 'CLICK'://自定义菜单点击事件
+                            //根据key值判断点击了哪个按钮
+                            return $message->EventKey;
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
                     return '收到事件消息';
                     break;
                 case 'text':
@@ -90,6 +102,51 @@ class WechatController extends Controller
         $response->send(); // Laravel 里请使用：return $response;
 
         //return $_GET['echostr'];服务器验证最简单的方法
+    }
+
+    //查询菜单
+    public function actionGetMenus()
+    {
+        $app = new Application(\Yii::$app->params['wechat']);
+        $menu = $app->menu;
+        $menus = $menu->all();
+        var_dump($menus);
+    }
+
+    //设置菜单
+    public function actionSetMenus()
+    {
+        $app = new Application(\Yii::$app->params['wechat']);
+        $menu = $app->menu;
+        $buttons = [
+            [
+                "type" => "click",
+                "name" => "今日歌曲",
+                "key"  => "V1001_TODAY_MUSIC"
+            ],
+            [
+                "name"       => "菜单",
+                "sub_button" => [
+                    [
+                        "type" => "view",
+                        "name" => "搜索",
+                        "url"  => "http://www.soso.com/"
+                    ],
+                    [
+                        "type" => "view",
+                        "name" => "视频",
+                        "url"  => "http://v.qq.com/"
+                    ],
+                    [
+                        "type" => "click",
+                        "name" => "赞一下我们",
+                        "key" => "V1001_GOOD"
+                    ],
+                ],
+            ],
+        ];
+        $r = $menu->add($buttons);
+        var_dump($r);
     }
 
 
