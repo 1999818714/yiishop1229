@@ -23,14 +23,14 @@ return [
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
             'loginUrl'=>['member/login'],
         ],
-        /*'session' => [
+        'session' => [
             // this is the name of the session cookie used for login on the frontend
             'name' => 'advanced-frontend',
-        ],*/
-        'session' => [
+        ],
+        /*'session' => [
               'class' => 'yii\redis\Session',
               // 'redis' => 'redis' // id of the connection application component
-          ],
+          ],*/
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -48,6 +48,7 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'api/getYourFav'=>'api/get-your-fav',//处理特殊请求，转发请求
             ],
         ],
         //配置购物车cookie操作组件
