@@ -11,8 +11,14 @@ namespace frontend\controllers;
 
 use EasyWeChat\Message\News;
 use EasyWeChat\Message\Text;
+use yii\helpers\Url;
 use yii\web\Controller;
 use EasyWeChat\Foundation\Application;
+
+/*
+ * 1、菜单设置好，点击 美女排行榜 按钮，回复美女排行榜图文信息（注意修改账号基本信息【配置文件里面修改】）
+ * 2、在页面获取用户openid（配置授权回调地址【配置文件里面修改】，修改授权回调域名【在测试号后台修改】）
+ */
 
 class WechatController extends Controller
 {
@@ -125,12 +131,12 @@ class WechatController extends Controller
                 "key"  => "V1001_TODAY_MUSIC"
             ],
             [
-                "name"       => "菜单",
+                "name"       => "个人信息",
                 "sub_button" => [
                     [
                         "type" => "view",
-                        "name" => "搜索",
-                        "url"  => "http://www.soso.com/"
+                        "name" => "账户信息",
+                        "url"  => Url::to(['wechat/user'],true),
                     ],
                     [
                         "type" => "view",
@@ -147,6 +153,48 @@ class WechatController extends Controller
         ];
         $r = $menu->add($buttons);
         var_dump($r);
+    }
+
+    //个人账户信息
+    public function actionUser()
+    {
+        //检查session中是否有openid
+        //如果没有
+        if(!\Yii::$app->session->get('openid')){
+            //获取用户的openid
+            //echo 'user';
+            $app = new Application(\Yii::$app->params['wechat']);
+            $response = $app->oauth->redirect();
+            //将当前路由保存到session，便于授权回调地址跳回当前页面
+            \Yii::$app->session->setFlash('back','wechat/user');
+            $response->send();
+        }
+
+
+        var_dump(\Yii::$app->session->get('openid'));
+    }
+    //查询个人订单
+    public function actionOrders()
+    {
+
+    }
+
+    //网页授权回调地址
+    public function actionCallback()
+    {
+        $app = new Application(\Yii::$app->params['wechat']);
+//        echo 'callback';
+        $user = $app->oauth->user();
+        //用户的openid
+        $user->id;
+        //将用户的openid保存到session
+        \Yii::$app->session->set('openid',$user->id);
+
+        //跳回请求地址
+        if(\Yii::$app->session->hasFlash('back')){
+            return $this->redirect([\Yii::$app->session->getFlash('back')]);
+        }
+
     }
 
 
