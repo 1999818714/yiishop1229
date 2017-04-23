@@ -11,6 +11,7 @@ namespace frontend\controllers;
 
 use EasyWeChat\Message\News;
 use EasyWeChat\Message\Text;
+use frontend\models\Member;
 use yii\helpers\Url;
 use yii\web\Controller;
 use EasyWeChat\Foundation\Application;
@@ -169,9 +170,17 @@ class WechatController extends Controller
             \Yii::$app->session->setFlash('back','wechat/user');
             $response->send();
         }
+        //从session中获取openid
+        $openid = \Yii::$app->session->get('openid');
+        //查询该openid是否绑定账号
+        $member = Member::findOne(['openid'=>$openid]);
+        if($member == null){
+            //没有绑定，跳转到绑定页面
+            return $this->redirect(['wechat/bang']);
+        }
+        //显示当前用户的账号信息
+        var_dump($member);
 
-
-        var_dump(\Yii::$app->session->get('openid'));
     }
     //查询个人订单
     public function actionOrders()
@@ -194,6 +203,18 @@ class WechatController extends Controller
         if(\Yii::$app->session->hasFlash('back')){
             return $this->redirect([\Yii::$app->session->getFlash('back')]);
         }
+
+    }
+
+    //绑定账号
+    public function actionBang()
+    {
+
+    }
+
+    //解除绑定
+    public function actionUnlink()
+    {
 
     }
 
